@@ -1,12 +1,33 @@
 package pa11;
 
+import java.util.ArrayList;
+
 public class HashSet {
+    int capacity; // capacity
+    ArrayList<String>[] data;
 
     /**
      * Constructor for the set
      */
     public HashSet() {
+        this.capacity = 17;
+        this.data = new ArrayList[capacity];
+
+        for (int i = 0; i < this.capacity; i++) {
+            this.data[i] = new ArrayList<>();
+        }
         System.out.println("HashSet");
+    }
+
+    private int hash(String s) {
+        int total = 0;
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+            int ascii = (int) ch;
+            total += ascii;
+        }
+        int position = total % capacity;
+        return position;
     }
 
     /**
@@ -14,8 +35,11 @@ public class HashSet {
      * @return the number of elements in the set
      */
     public int size() {
-        System.out.println("Size");
-        return 0;
+        int size = 0;
+        for (ArrayList<String> bucket : data) {
+            size += bucket.size();
+        }
+        return size;
     }
 
     /** 
@@ -23,25 +47,30 @@ public class HashSet {
      * @return a boolean indicating whether the set is empty
      */
     public boolean isEmpty() {
-        return false;
+        return size() == 0;
     }
 
     /**
      * Add an element to the set
      * @param s the element to add
-     * @return the old value associated with the key, or null if no such entry exists
      */
     public void add(String s) {
-        System.out.println("Adding " + s);
+        int position = this.hash(s);
+        if (!data[position].contains(s)) {
+            data[position].add(s);
+            System.out.println("Adding " + s);
+        }
     }
 
     /** 
      * Remove an element from the set
      * @param s the element to remove
-     * @return the value associated with the key, or null if no such entry exists
      */
     public void remove(String s) {
-        System.out.println("Removing " + s);
+        int position = this.hash(s);
+        if (data[position].remove(s)) {
+            System.out.println("Removing " + s);
+        }
     }
 
     /** 
@@ -50,14 +79,17 @@ public class HashSet {
      * @return a boolean indicating whether the set contains the element
      */
     public boolean contains(String s) {
-        System.out.println("Contains " + s);
-        return false;
+        int position = this.hash(s);
+        return data[position].contains(s);
     }
 
     /** 
      * Clears the set
      */
     public void clear() {
+        for (int i = 0; i < this.capacity; i++) {
+            this.data[i].clear();
+        }
         System.out.println("Clear");
     }
 
@@ -66,7 +98,11 @@ public class HashSet {
      * @return an array containing all the elements in the set
      */
     public String[] toArray() {
-        return null;
+        ArrayList<String> allElements = new ArrayList<>();
+        for (ArrayList<String> bucket : data) {
+            allElements.addAll(bucket);
+        }
+        return allElements.toArray(new String[0]);
     }
 
     /** 
@@ -75,7 +111,15 @@ public class HashSet {
      * @return a new `HashSet` containing the intersection of the current set and the `other` set
      */
     public HashSet intersection(HashSet other) {
-        return null;
+        HashSet result = new HashSet();
+        for (ArrayList<String> bucket : data) {
+            for (String element : bucket) {
+                if (other.contains(element)) {
+                    result.add(element);
+                }
+            }
+        }
+        return result;
     }
 
     /** 
@@ -84,7 +128,18 @@ public class HashSet {
      * @return a new `HashSet` containing the union of the current set and the `other` set
      */
     public HashSet union(HashSet other) {
-        return null;
+        HashSet result = new HashSet();
+        for (ArrayList<String> bucket : data) {
+            for (String element : bucket) {
+                result.add(element);
+            }
+        }
+        for (ArrayList<String> bucket : other.data) {
+            for (String element : bucket) {
+                result.add(element);
+            }
+        }
+        return result;
     }
 
     /** 
@@ -93,16 +148,35 @@ public class HashSet {
      * @return a new `HashSet` containing the difference of the current set and the `other` set
      */
     public HashSet difference(HashSet other) {
-        return null;
-    }
+        HashSet result = new HashSet();
+        for (ArrayList<String> bucket : data) {
+            for (String element : bucket) {
+                if (!other.contains(element)) {
+                    result.add(element);
+                }
+            }
+        }
+        return result;
+}
 
-    /** 
-     * Check if the current set is a subset of the `other` set
-     * @param other the set to check for a subset
-     * @return a boolean indicating whether the current set is a subset of the `other` set
-     */
-    public boolean subset(HashSet other) {
-        return false;
+/** 
+ * Check if the current set is a subset of the `other` set
+ * @param other the set to check for a subset
+ * @return a boolean indicating whether the current set is a subset of the `other` set
+ */
+public boolean subset(HashSet other) {
+    for (ArrayList<String> bucket : data) {
+        for (String element : bucket) {
+            if (!other.contains(element)) {
+                return false; // If any element is not in 'other', return false
+            }
+        }
     }
-        
+    return true; // All elements are in 'other'
+}
+
+    public static void main() {
+        // This is an empty main method.
+
+    }
 }
